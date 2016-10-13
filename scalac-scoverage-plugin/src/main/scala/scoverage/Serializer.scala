@@ -3,6 +3,7 @@ package scoverage
 import java.io._
 
 import scala.io.Source
+import scala.xml.Utility
 
 object Serializer {
 
@@ -19,59 +20,60 @@ object Serializer {
   def serialize(coverage: Coverage, writer: Writer): Unit = {
     def writeStatement(stmt: Statement, writer: Writer): Unit = {
       writer.write {
-        val xml = "<statement>" +
-          "<source>" +
+        val xml = <statement>
+          <source>
             {stmt.source}
-          "</source>" +
-          "<package>" +
+          </source>
+          <package>
             {stmt.location.packageName}
-          "</package>" +
-          "<class>" +
+          </package>
+          <class>
             {stmt.location.className}
-          "</class>" +
-          "<classType>" +
+          </class>
+          <classType>
             {stmt.location.classType.toString}
-          "</classType>" +
-          "<fullClassName>" +
+          </classType>
+          <fullClassName>
             {stmt.location.fullClassName}
-          "</fullClassName>" +
-          "<method>" +
+          </fullClassName>
+          <method>
             {stmt.location.method}
-          "</method>" +
-          "<path>" +
+          </method>
+          <path>
             {stmt.location.sourcePath}
-          "</path>" +
-          "<id>" +
+          </path>
+          <id>
             {stmt.id.toString}
-          "</id>" +
-          "<start>" +
+          </id>
+          <start>
             {stmt.start.toString}
-          "</start>" +
-          "<end>" +
+          </start>
+          <end>
             {stmt.end.toString}
-          "</end>" +
-          "<line>" +
+          </end>
+          <line>
             {stmt.line.toString}
-          "</line>" +
-          "<description>" +
+          </line>
+          <description>
             {escape(stmt.desc)}
-          "</description>" +
-          "<symbolName>" +
+          </description>
+          <symbolName>
             {escape(stmt.symbolName)}
-          "</symbolName>" +
-          "<treeName>" +
+          </symbolName>
+          <treeName>
             {escape(stmt.treeName)}
-          "</treeName>" +
-          "<branch>" +
+          </treeName>
+          <branch>
             {stmt.branch.toString}
-          "</branch>" +
-          "<count>" +
+          </branch>
+          <count>
             {stmt.count.toString}
-          "</count>" +
-          "<ignored>" +
+          </count>
+          <ignored>
             {stmt.ignored.toString}
-          "</ignored>" +
-        "</statement>"
+          </ignored>
+        </statement>
+        Utility.trim(xml) + "\n"
       }
     }
     writer.write("<statements>\n")

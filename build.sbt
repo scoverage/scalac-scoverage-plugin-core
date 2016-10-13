@@ -10,9 +10,10 @@ val JUnitVersion = "0.9"
 
 val appSettings = Seq(
     organization := Org,
-    crossVersion := CrossVersion.full, // because compiler api is not binary compatible
+
     scalaVersion := "2.11.8",
-    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M3", "2.12.0-M4","2.12.0-M5","2.12.0-RC1", "2.12.0-RC1-ceaf419"),
+    crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC1"),
+
     fork in Test := false,
     publishMavenStyle := true,
     publishArtifact in Test := false,
@@ -80,11 +81,15 @@ lazy val plugin = Project("scalac-scoverage-plugin", file("scalac-scoverage-plug
     //.dependsOn(`scalac-scoverage-runtime-java` % "test")
     .settings(name := "scalac-scoverage-plugin")
     .settings(appSettings: _*)
+    .settings(
+       crossVersion := CrossVersion.full, // because compiler api is not binary compatible
+       crossScalaVersions ++= Seq("2.12.0-M3", "2.12.0-M4","2.12.0-M5", "2.12.0-RC1-ceaf419")
+    )
     .settings(libraryDependencies ++= Seq(
   //  "org.mockito" % "mockito-all" % MockitoVersion % "test",
    // "org.scalatest" %% "scalatest" % ScalatestVersion % "test",
     "com.novocode" % "junit-interface" % "0.9" % "test",
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided" excludeAll(ExclusionRule(organization="org.scala-lang.modules")),
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value % "provided",
     "org.joda" % "joda-convert" % "1.6" % "test",
     "joda-time" % "joda-time" % "2.3" % "test"
   ))
