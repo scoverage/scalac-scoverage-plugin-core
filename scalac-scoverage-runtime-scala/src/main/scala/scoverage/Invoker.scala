@@ -1,14 +1,14 @@
 package scoverage
 
-import scala.collection.{mutable, Set}
-import scoverage.Platform._
+import java.io.{File, FileWriter}
+import scala.collection.concurrent.TrieMap
 
 /** @author Stephen Samuel */
 object Invoker {
 
   private val MeasurementsPrefix = "scoverage.measurements."
-  private val threadFiles = new ThreadLocal[ThreadSafeMap[String, FileWriter]]
-  private val ids = ThreadSafeMap.empty[(String, Int), Any]
+  private val threadFiles = new ThreadLocal[TrieMap[String, FileWriter]]
+  private val ids = TrieMap.empty[(String, Int), Any]
 
   /**
    * We record that the given id has been invoked by appending its id to the coverage
@@ -36,7 +36,7 @@ object Invoker {
       // and because file appends via FileWriter are not atomic on Windows.
       var files = threadFiles.get()
       if (files == null) {
-        files = ThreadSafeMap.empty[String, FileWriter]
+        files = TrieMap.empty[String, FileWriter]
         threadFiles.set(files)
       }
       val writer = files.getOrElseUpdate(dataDir, new FileWriter(measurementFile(dataDir), true))
@@ -48,24 +48,4 @@ object Invoker {
 
   def measurementFile(dataDir: File): File = measurementFile(dataDir.getAbsolutePath)
   def measurementFile(dataDir: String): File = new File(dataDir, MeasurementsPrefix + Thread.currentThread.getId)
-
-  def findMeasurementFiles(dataDir: String): Array[File] = findMeasurementFiles(new File(dataDir))
-  def findMeasurementFiles(dataDir: File): Array[File] = dataDir.listFiles(new FileFilter {
-    override def accept(pathname: File): Boolean = pathname.getName.startsWith(MeasurementsPrefix)
-  })
-
-  // loads all the invoked statement ids from the given files
-  def invoked(files: Seq[File]): Set[Int] = {
-    val acc = mutable.Set[Int]()
-    files.foreach { file =>
-      val reader = Source.fromFile(file)
-      for (line <- reader.getLines()) {
-        if (!line.isEmpty) {
-          acc += line.toInt
-        }
-      }
-      reader.close()
-    }
-    acc
-  }
 }
